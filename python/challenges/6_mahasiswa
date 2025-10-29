@@ -1,0 +1,162 @@
+# ============================================
+# MINI PROJECT: STUDENT SCORE MANAGER
+# ============================================
+
+class Student:
+    def __init__(self, name):
+        self.name = name
+        self.scores = []
+
+    def add_score(self, score):
+        self.scores.append(score)
+
+    def edit_score(self, index, new_score):
+        if 0 <= index < len(self.scores):
+            self.scores[index] = new_score
+        else:
+            print("❌ Indeks nilai tidak valid.")
+
+    def delete_score(self, index):
+        if 0 <= index < len(self.scores):
+            del self.scores[index]
+        else:
+            print("❌ Indeks nilai tidak valid.")
+
+    def average(self):
+        if self.scores:
+            return sum(self.scores) / len(self.scores)
+        return 0
+
+    def grade(self):
+        avg = self.average()
+        if avg >= 85:
+            return "A"
+        elif avg >= 70:
+            return "B"
+        elif avg >= 60:
+            return "C"
+        else:
+            return "E"
+
+
+class StudentManager:
+    def __init__(self):
+        self.students = {}
+
+    def add_student(self, name):
+        if name in self.students:
+            print("⚠️ Mahasiswa sudah ada.")
+        else:
+            self.students[name] = Student(name)
+            print(f"✅ Mahasiswa '{name}' ditambahkan.")
+
+    def edit_student(self, old_name, new_name):
+        if old_name in self.students:
+            self.students[new_name] = self.students.pop(old_name)
+            self.students[new_name].name = new_name
+            print(f"✏️ Nama '{old_name}' diubah menjadi '{new_name}'.")
+        else:
+            print("❌ Mahasiswa tidak ditemukan.")
+
+    def delete_student(self, name):
+        if name in self.students:
+            del self.students[name]
+            print(f"🗑️ Mahasiswa '{name}' dihapus.")
+        else:
+            print("❌ Mahasiswa tidak ditemukan.")
+
+    def show_all(self):
+        if not self.students:
+            print("📭 Belum ada data mahasiswa.")
+            return
+        print("\n=== Daftar Mahasiswa ===")
+        for name, student in self.students.items():
+            print(f"- {name}: Nilai = {student.scores} | Rata-rata = {student.average():.2f} | Grade = {student.grade()}")
+
+    def class_average(self):
+        if not self.students:
+            return 0
+        return sum(student.average() for student in self.students.values()) / len(self.students)
+
+    def top_student(self):
+        if not self.students:
+            return None
+        return max(self.students.values(), key=lambda s: s.average())
+
+
+# ============================================
+# MAIN PROGRAM (CLI)
+# ============================================
+
+def main():
+    manager = StudentManager()
+
+    while True:
+        print("\n=== STUDENT SCORE MANAGER ===")
+        print("1. Tambah mahasiswa")
+        print("2. Edit nama mahasiswa")
+        print("3. Hapus mahasiswa")
+        print("4. Tambah/Edit/Hapus nilai mahasiswa")
+        print("5. Tampilkan semua mahasiswa")
+        print("6. Rata-rata kelas & top mahasiswa")
+        print("0. Keluar")
+
+        choice = input("Pilih menu: ")
+
+        if choice == "1":
+            name = input("Nama mahasiswa: ")
+            manager.add_student(name)
+
+        elif choice == "2":
+            old = input("Nama lama: ")
+            new = input("Nama baru: ")
+            manager.edit_student(old, new)
+
+        elif choice == "3":
+            name = input("Nama mahasiswa yang akan dihapus: ")
+            manager.delete_student(name)
+
+        elif choice == "4":
+            name = input("Nama mahasiswa: ")
+            if name not in manager.students:
+                print("❌ Mahasiswa tidak ditemukan.")
+                continue
+            student = manager.students[name]
+            print("\n1. Tambah nilai")
+            print("2. Edit nilai")
+            print("3. Hapus nilai")
+            sub_choice = input("Pilih: ")
+
+            if sub_choice == "1":
+                score = float(input("Masukkan nilai: "))
+                student.add_score(score)
+            elif sub_choice == "2":
+                print(f"Nilai sekarang: {student.scores}")
+                idx = int(input("Indeks nilai yang ingin diubah (mulai dari 0): "))
+                new_score = float(input("Nilai baru: "))
+                student.edit_score(idx, new_score)
+            elif sub_choice == "3":
+                print(f"Nilai sekarang: {student.scores}")
+                idx = int(input("Indeks nilai yang ingin dihapus (mulai dari 0): "))
+                student.delete_score(idx)
+            else:
+                print("❌ Pilihan tidak valid.")
+
+        elif choice == "5":
+            manager.show_all()
+
+        elif choice == "6":
+            print(f"\n📊 Rata-rata kelas: {manager.class_average():.2f}")
+            top = manager.top_student()
+            if top:
+                print(f"🏆 Top mahasiswa: {top.name} (Rata-rata: {top.average():.2f}, Grade: {top.grade()})")
+
+        elif choice == "0":
+            print("👋 Keluar dari program...")
+            break
+        else:
+            print("❌ Pilihan tidak valid, coba lagi.")
+
+
+if __name__ == "__main__":
+    main()
